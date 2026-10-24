@@ -3,6 +3,8 @@ name: Publish to PyPI
 on:
   release:
     types: [published]
+  # publishes the tag the workflow is run on, e.g. to re-run a failed release
+  workflow_dispatch:
 
 jobs:
   build:

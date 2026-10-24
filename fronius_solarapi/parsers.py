@@ -55,12 +55,13 @@ def _object(value: Any, what: str) -> JsonObject:
 
 
 def _number(data: JsonObject, key: str) -> float | None:
+    """Return a number field as reported, an `int` where JSON has no fraction."""
     value = data.get(key)
     if value is None:
         return None
     if isinstance(value, bool) or not isinstance(value, int | float):
         raise _invalid(f"{key} is not a number: {value!r}")
-    return float(value)
+    return value
 
 
 def _integer(data: JsonObject, key: str) -> int | None:
@@ -94,12 +95,6 @@ def _html_string(data: JsonObject, key: str) -> str | None:
     """Return a string field that Datamanagers HTML-escape, GEN24 don't."""
     value = _string(data, key)
     return None if value is None else unescape(value)
-
-
-def _stripped_string(data: JsonObject, key: str) -> str | None:
-    """Return a string field that batteries pad with trailing whitespace."""
-    value = _string(data, key)
-    return None if value is None else value.strip()
 
 
 def _epoch(data: JsonObject, key: str) -> datetime | None:
@@ -206,7 +201,9 @@ def parse_details(data: JsonObject) -> DeviceDetails | None:
     return DeviceDetails(
         manufacturer=_html_string(details, "Manufacturer"),
         model=_html_string(details, "Model"),
-        serial=_stripped_string(details, "Serial"),
+        # kept as reported: batteries pad it with whitespace, and callers may
+        # already use the padded value as an identifier
+        serial=_string(details, "Serial"),
         hardware=_string(details, "Hardware"),
         software=_string(details, "Software"),
     )

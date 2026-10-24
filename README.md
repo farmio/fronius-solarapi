@@ -47,7 +47,8 @@ System scope results and the active device info are keyed by the device id the
 device reports (the Solar Net address, `"1"` on GEN24).
 
 All models are frozen dataclasses. Measurements are `float | None` in the base
-unit of the API (W, VA, VAr, Wh, VArh, V, A, Hz, °C, percent); codes are
+unit of the API (W, VA, VAr, Wh, VArh, V, A, Hz, °C, percent), kept as `int`
+where the device reports a number without fraction; codes are
 `int | None`; flags are `bool | None`. `None` means the device did not report
 the value. Lookups for the codes are included: `InverterInfo.model` and
 `PowerFlowInverter.model` resolve the device type table of the spec,
@@ -135,7 +136,6 @@ time out after 10 seconds by default (`timeout=`).
   info instead of inside `Inverter`.
 - Some GEN24 firmware reports meter channels under internal names
   (`SMARTMETER_*`, `ACBRIDGE_*`).
-- Battery serial numbers are padded with whitespace.
 - The power flow `Version` is an integer within a string, and absent on old
   Datamanagers.
 - API v0 names the device parameter `DeviceIndex` and has no system scope for

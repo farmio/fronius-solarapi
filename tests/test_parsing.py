@@ -255,13 +255,13 @@ def test_meter_details_missing() -> None:
 
 
 def test_storage_serial_whitespace() -> None:
-    """Battery serial numbers are padded with whitespace."""
+    """Battery serial numbers are padded with whitespace, which is kept."""
     storage = parse_storage_data(
         _body("gen24_storage/GetStorageRealtimeData.json")["0"]
     )
     assert storage.controller is not None
     assert storage.controller.details is not None
-    assert storage.controller.details.serial == "P030T020Z2001234567"
+    assert storage.controller.details.serial == "P030T020Z2001234567     "
     assert storage.controller.status_battery_cell == 0
     assert storage.controller.enabled is True
     assert storage.modules == ()
@@ -277,7 +277,7 @@ async def test_storage_modules(mock_fronius: MockFronius, api: FroniusSolarApi) 
     assert len(storage.modules) == 2
     module = storage.modules[0]
     assert module.details is not None
-    assert module.details.serial == "S012002885"
+    assert module.details.serial == "S012002885 "
     assert module.cycle_count_battery_cell == 255
     assert module.status_battery_cell == 53
     assert module.temperature_cell_maximum == 27.75

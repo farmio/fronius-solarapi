@@ -1,10 +1,11 @@
 """Typed representations of Solar API responses.
 
 Measurement fields carry the base unit of the API: W, VA, VAr, Wh, VArh, V, A,
-Hz, °C and percent. `None` means the device did not report the value - either
-because the channel does not exist on it or because it is not available right
-now (e.g. energies on GEN24 devices, which always report `null` for day and
-year energy).
+Hz, °C and percent, typed `float` but kept as `int` where the device reports a
+number without fraction. `None` means the device did not report the value -
+either because the channel does not exist on it or because it is not available
+right now (e.g. energies on GEN24 devices, which always report `null` for day
+and year energy).
 """
 
 from __future__ import annotations
@@ -83,6 +84,7 @@ class DeviceDetails:
     manufacturer: str | None
     model: str | None
     serial: str | None
+    """As reported, batteries pad it with trailing whitespace."""
     hardware: str | None = None
     software: str | None = None
 
