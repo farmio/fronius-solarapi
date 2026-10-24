@@ -206,3 +206,133 @@ class LedState(StrEnum):
     OFF = "off"
     BLINKING = "blinking"
     ALTERNATING = "alternating"
+
+
+class PowerFlowOhmpilotState(StrEnum):
+    """Known values of the `State` of an Ohmpilot in the power flow."""
+
+    NORMAL = "normal"
+    MIN_TEMPERATURE = "min-temperature"
+    LEGIONELLA_PROTECTION = "legionella-protection"
+    FAULT = "fault"
+    WARNING = "warning"
+    BOOST = "boost"
+
+
+class PowerFlowOhmpilotEcoState(StrEnum):
+    """Known values of the heating rod states of an Ohmpilot Eco in the power flow."""
+
+    NORMAL = "normal"
+    MIN_TEMPERATURE = "min-temperature"
+    LEGIONELLA_PROTECTION = "legionella-protection"
+    FAULT = "fault"
+    WARNING = "warning"
+    BOOST = "boost"
+    TARGET_TEMPERATURE = "target-temperature"
+    MAX_TEMPERATURE = "max-temperature"
+    TIMESCHEDULE = "timeschedule"
+
+
+class MeterCategory(StrEnum):
+    """Known `Category` tokens of secondary meters in the power flow."""
+
+    PV_INVERTER = "METER_CAT_WR"
+    AC_STORAGE = "METER_CAT_BAT"
+    PV_INVERTER_WITH_STORAGE = "METER_CAT_PV_BAT"
+    WIND_TURBINE = "METER_CAT_WINDMILL"
+    COMBINED_HEAT_AND_POWER = "METER_CAT_BHKW"
+    ELECTRIC_VEHICLE = "METER_CAT_ECAR"
+    HEAT_PUMP = "METER_CAT_HEATPUMP"
+    OTHER_HEATING = "METER_CAT_OTHERHEATING"
+    PUMP = "METER_CAT_PUMP"
+    WHITE_GOODS = "METER_CAT_WHITEGOODS"
+    CLIMATE = "METER_CAT_CLIMATE"
+    BUILDING_SERVICES = "METER_CAT_BUILDING"
+    OTHER = "METER_CAT_OTHER"
+
+
+class SolarBatteryCellState(IntEnum):
+    """State of a Fronius Solar Battery module (spec table 2).
+
+    The values 0, 8 and 15 are reserved.
+    """
+
+    PRE_CHARGE = 0x1
+    INITIAL = 0x2
+    NORMAL_CHARGE = 0x3
+    CHARGE_TERMINATE = 0x4
+    NORMAL_DISCHARGE = 0x5
+    OVER_VOLTAGE = 0x6
+    OVER_DISCHARGE = 0x7
+    OVER_TEMPERATURE_CHARGE = 0x9
+    OVER_CURRENT_CHARGE = 0xA
+    OVER_TEMPERATURE_DISCHARGE = 0xB
+    OVER_CURRENT_DISCHARGE = 0xC
+    CELL_UNBALANCE = 0xD
+    CHARGE_SUSPEND = 0xE
+
+
+class LgChemBatteryState(IntEnum):
+    """Controller state of an LG Chem RESU H battery (spec table 2)."""
+
+    STANDBY = 1
+    ENABLED = 3
+    FAULTED = 5
+    SLEEP = 10
+
+
+class BydBatteryState(IntEnum):
+    """Controller state of a BYD Battery-Box (spec table 2)."""
+
+    STANDBY = 0
+    INACTIVE = 1
+    DARKSTART = 2
+    ACTIVE = 3
+    FAULT = 4
+    UPDATING = 5
+
+
+def solar_battery_cell_states(
+    status: int | None,
+) -> tuple[SolarBatteryCellState | None, SolarBatteryCellState | None]:
+    """Return the current and previous state of a Fronius Solar Battery module.
+
+    `Status_BatteryCell` of a module is one byte `0xYX`, the high nibble `Y`
+    is the current and the low nibble `X` the previous state. Reserved or
+    out-of-range values are `None`.
+    """
+    if status is None or not 0 <= status <= 0xFF:
+        return None, None
+    return _cell_state(status >> 4), _cell_state(status & 0xF)
+
+
+def _cell_state(nibble: int) -> SolarBatteryCellState | None:
+    try:
+        return SolarBatteryCellState(nibble)
+    except ValueError:
+        return None
+
+
+_CONTROLLER_STATES: dict[str, type[LgChemBatteryState] | type[BydBatteryState]] = {
+    "lg-chem": LgChemBatteryState,
+    "byd": BydBatteryState,
+}
+
+
+def battery_controller_state(
+    manufacturer: str | None, status: int | None
+) -> LgChemBatteryState | BydBatteryState | None:
+    """Return the state of a storage controller from its `Status_BatteryCell`.
+
+    The meaning of the code depends on the battery manufacturer; the spec
+    documents LG Chem RESU H and BYD Battery-Box. Other manufacturers, and
+    codes outside the documented tables, are `None`.
+    """
+    if manufacturer is None or status is None:
+        return None
+    if (enum := _CONTROLLER_STATES.get(manufacturer.strip().casefold())) is None:
+        return None
+    try:
+        return enum(status)
+    except ValueError:
+        return None

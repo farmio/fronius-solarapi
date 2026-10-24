@@ -53,9 +53,12 @@ the value. Lookups for the codes are included: `InverterInfo.model` and
 `PowerFlowInverter.model` resolve the device type table of the spec,
 `InverterInfo.state` and `DeviceStatus.state` the inverter status codes,
 `MeterData.meter_location` the meter location codes and `OhmpilotData.state`
-the Ohmpilot state codes. The known string values of power flow mode, battery
-mode, meter location and LED color/state are available as `StrEnum`s for
-comparison.
+the Ohmpilot state codes. Battery states are decoded as the spec describes:
+`StorageModule.cell_state` and `previous_cell_state` for Fronius Solar Battery
+modules, and `StorageController.state` for LG Chem RESU H and BYD Battery-Box
+controllers. The known string values of power flow mode, battery mode, meter
+location, secondary meter category, Ohmpilot and Ohmpilot Eco states and LED
+color/state are available as `StrEnum`s for comparison.
 
 ## Errors
 

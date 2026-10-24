@@ -16,12 +16,17 @@ from typing import Any
 
 from .const import (
     ApiVersion,
+    BydBatteryState,
     InverterState,
+    LgChemBatteryState,
     MeterLocation,
     OhmpilotState,
+    SolarBatteryCellState,
     StatusCode,
+    battery_controller_state,
     inverter_state,
     meter_location,
+    solar_battery_cell_states,
 )
 from .device_types import InverterModel, inverter_model
 
@@ -372,7 +377,18 @@ class StorageController:
     voltage_dc_maximum_cell: float | None
     voltage_dc_minimum_cell: float | None
     status_battery_cell: int | None
-    """Manufacturer specific status, see spec table 2."""
+    """Manufacturer specific status, see `state`."""
+
+    @property
+    def state(self) -> LgChemBatteryState | BydBatteryState | None:
+        """Return the state, decoded by the manufacturer of the battery.
+
+        Only LG Chem RESU H and BYD Battery-Box codes are documented.
+        """
+        return battery_controller_state(
+            None if self.details is None else self.details.manufacturer,
+            self.status_battery_cell,
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -394,7 +410,17 @@ class StorageModule:
     voltage_dc_minimum_cell: float | None
     cycle_count_battery_cell: int | None
     status_battery_cell: int | None
-    """Current and previous cell state, one byte `0xYX`, see spec table 2."""
+    """Current and previous cell state, one byte `0xYX`, see `cell_state`."""
+
+    @property
+    def cell_state(self) -> SolarBatteryCellState | None:
+        """Return the current state of the module."""
+        return solar_battery_cell_states(self.status_battery_cell)[0]
+
+    @property
+    def previous_cell_state(self) -> SolarBatteryCellState | None:
+        """Return the state the module was in before the current one."""
+        return solar_battery_cell_states(self.status_battery_cell)[1]
 
 
 @dataclass(frozen=True, slots=True)
@@ -485,6 +511,7 @@ class PowerFlowOhmpilot:
 
     power_ac_total: float | None
     state: str | None
+    """See `PowerFlowOhmpilotState`."""
     temperature: float | None
 
 
@@ -494,7 +521,9 @@ class PowerFlowOhmpilotEco:
 
     power_ac_total: float | None
     state_heating_rod_1: str | None
+    """See `PowerFlowOhmpilotEcoState`."""
     state_heating_rod_2: str | None
+    """See `PowerFlowOhmpilotEcoState`."""
     temperature_1: float | None
     temperature_2: float | None
 
@@ -509,7 +538,7 @@ class PowerFlowSecondaryMeter:
     label: str | None
     """User defined name, "<primary>" for primary meters."""
     category: str | None
-    """Category token, e.g. "METER_CAT_HEATPUMP"."""
+    """Category token, see `MeterCategory`."""
 
     @property
     def meter_location(self) -> MeterLocation | None:
