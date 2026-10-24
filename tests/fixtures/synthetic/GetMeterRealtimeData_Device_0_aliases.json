@@ -1,0 +1,25 @@
+{
+  "Body": {
+    "Data": {
+      "ACBRIDGE_CURRENT_ACTIVE_MEAN_01_F32": 1.2,
+      "ACBRIDGE_CURRENT_ACTIVE_MEAN_02_F32": 2.3,
+      "ACBRIDGE_CURRENT_ACTIVE_MEAN_03_F32": 3.4,
+      "Details": {"Manufacturer": "Fronius", "Model": "Smart Meter TS 65A-3", "Serial": "1234567890"},
+      "Enable": 1.0,
+      "Meter_Location_Current": 0.0,
+      "SMARTMETER_ENERGYACTIVE_CONSUMED_SUM_F64": 1000.0,
+      "SMARTMETER_ENERGYACTIVE_PRODUCED_SUM_F64": 2000.0,
+      "SMARTMETER_POWERACTIVE_01_F64": 100.0,
+      "SMARTMETER_POWERACTIVE_02_F64": 200.0,
+      "SMARTMETER_POWERACTIVE_03_F64": 300.0,
+      "SMARTMETER_POWERACTIVE_MEAN_SUM_F64": 600.0,
+      "TimeStamp": 1637924872.0,
+      "Visible": 1.0
+    }
+  },
+  "Head": {
+    "RequestArguments": {"DeviceId": "0", "Scope": "Device"},
+    "Status": {"Code": 0, "Reason": "", "UserMessage": ""},
+    "Timestamp": "2021-11-26T11:07:52+00:00"
+  }
+}

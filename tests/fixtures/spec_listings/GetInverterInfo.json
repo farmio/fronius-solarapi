@@ -1,0 +1,19 @@
+{
+  "Body": {
+    "Data": {
+      "1": {
+        "CustomName": "tr-3pn-01",
+        "DT": 1,
+        "PVPower": 0,
+        "Show": 1,
+        "StatusCode": "Running",
+        "UniqueID": "29301000987160033"
+      }
+    }
+  },
+  "Head": {
+    "RequestArguments": {},
+    "Status": {"Code": 0, "Reason": "", "UserMessage": ""},
+    "Timestamp": "2019-08-28T07:47:43+00:00"
+  }
+}

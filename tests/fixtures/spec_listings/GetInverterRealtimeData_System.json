@@ -1,0 +1,12 @@
+{
+  "Body": {
+    "Data": {
+      "PAC": {"Unit": "W", "Value": {"1": 271.0}}
+    }
+  },
+  "Head": {
+    "RequestArguments": {"DeviceClass": "Inverter", "Scope": "System"},
+    "Status": {"Code": 0, "Reason": "", "UserMessage": ""},
+    "Timestamp": "2019-08-28T05:28:12+00:00"
+  }
+}

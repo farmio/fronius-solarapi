@@ -1,0 +1,8 @@
+{
+  "Body": {"Data": {}},
+  "Head": {
+    "RequestArguments": {"DataCollection": "CommonInverterData", "DeviceClass": "Inverter", "DeviceId": "1", "Scope": "Device"},
+    "Status": {"Code": 8, "Reason": "LNRequestTimeout", "UserMessage": ""},
+    "Timestamp": "2021-10-07T10:01:17+02:00"
+  }
+}

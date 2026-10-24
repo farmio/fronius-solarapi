@@ -1,0 +1,15 @@
+{
+  "Body": {
+    "Data": {
+      "PowerLED": {"Color": "green", "State": "on"},
+      "SolarNetLED": {"Color": "green", "State": "on"},
+      "SolarWebLED": {"Color": "green", "State": "on"},
+      "WLANLED": {"Color": "red", "State": "on"}
+    }
+  },
+  "Head": {
+    "RequestArguments": {},
+    "Status": {"Code": 0, "Reason": "", "UserMessage": ""},
+    "Timestamp": "2019-06-12T15:31:07+02:00"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "Body": {
+    "Data": {
+      "IAC_L1": {"Unit": "A", "Value": 0.39000001549720764},
+      "IAC_L2": {"Unit": "A", "Value": 0.38900002837181091},
+      "IAC_L3": {"Unit": "A", "Value": 0.3970000147819519},
+      "UAC_L1": {"Unit": "V", "Value": 233.10000610351562},
+      "UAC_L2": {"Unit": "V", "Value": 234.5},
+      "UAC_L3": {"Unit": "V", "Value": 230.71844482421875}
+    }
+  },
+  "Head": {
+    "RequestArguments": {
+      "DataCollection": "3PInverterData",
+      "DeviceClass": "Inverter",
+      "DeviceId": "1",
+      "Scope": "Device"
+    },
+    "Status": {"Code": 0, "Reason": "", "UserMessage": ""},
+    "Timestamp": "2021-01-19T11:04:36+00:00"
+  }
+}

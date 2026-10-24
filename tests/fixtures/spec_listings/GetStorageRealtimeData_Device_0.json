@@ -1,0 +1,24 @@
+{
+  "Body": {
+    "Data": {
+      "Controller": {
+        "Capacity_Maximum": 9800,
+        "Current_DC": 0.90000000000000002,
+        "DesignedCapacity": 9800,
+        "Details": {"Manufacturer": "LG-Chem", "Model": "Resu H", "Serial": "1706179036"},
+        "Enable": 1,
+        "StateOfCharge_Relative": 56,
+        "Status_BatteryCell": 3,
+        "Temperature_Cell": 27.550000000000001,
+        "TimeStamp": 1560346267,
+        "Voltage_DC": 407.5
+      },
+      "Modules": []
+    }
+  },
+  "Head": {
+    "RequestArguments": {"DeviceClass": "Storage", "DeviceId": "0", "Scope": "Device"},
+    "Status": {"Code": 0, "Reason": "", "UserMessage": ""},
+    "Timestamp": "2019-06-12T15:31:08+02:00"
+  }
+}

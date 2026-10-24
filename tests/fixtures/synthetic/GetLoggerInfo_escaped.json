@@ -1,0 +1,19 @@
+{
+  "Body": {
+    "LoggerInfo": {
+      "CO2Factor": 0.53,
+      "CO2Unit": "&#107;&#103;",
+      "CashCurrency": "&#8364;",
+      "CashFactor": 0.12,
+      "HWVersion": "2.4D",
+      "SWVersion": "3.14.1-2",
+      "UTCOffset": 4294956496,
+      "UniqueID": "240.107620"
+    }
+  },
+  "Head": {
+    "RequestArguments": {},
+    "Status": {"Code": 0, "Reason": "", "UserMessage": ""},
+    "Timestamp": "2019-06-12T15:31:06+02:00"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "Body": {
+    "Data": {
+      "DeviceStatus:": {"InverterState": "Running"},
+      "PAC": {"Unit": "W", "Value": 8.4296154682294417e+252}
+    }
+  },
+  "Head": {
+    "RequestArguments": {
+      "DataCollection": "CumulationInverterData",
+      "DeviceClass": "Inverter",
+      "DeviceId": "1",
+      "Scope": "Device"
+    },
+    "Status": {"Code": 0, "Reason": "", "UserMessage": ""},
+    "Timestamp": "2019-08-28T05:59:13+00:00"
+  }
+}

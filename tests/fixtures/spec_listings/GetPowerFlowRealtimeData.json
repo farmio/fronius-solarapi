@@ -1,0 +1,38 @@
+{
+  "Body": {
+    "Data": {
+      "Inverters": {
+        "1": {"DT": 1, "E_Day": null, "E_Total": 410303.56194444443, "E_Year": null, "P": 106.80265045166016}
+      },
+      "SecondaryMeters": {
+        "12": {"Category": "METER_CAT_OTHERHEATING", "Label": "Heat", "MLoc": 256.0, "P": -0.0}
+      },
+      "Site": {
+        "BackupMode": false,
+        "E_Day": null,
+        "E_Total": 410303.56194444443,
+        "E_Year": null,
+        "Meter_Location": "grid",
+        "Mode": "meter",
+        "P_Akku": null,
+        "P_Grid": 0.0,
+        "P_Load": -106.80265045166016,
+        "P_PV": 129.96044921875,
+        "rel_Autonomy": 100.0,
+        "rel_SelfConsumption": 100.0
+      },
+      "Smartloads": {
+        "Ohmpilots": {},
+        "OhmpilotEcos": {
+          "0": {"P_AC_Total": 0.0, "State_HR1": "normal", "State_HR2": "normal", "Temperature_1": 0.0, "Temperature_2": 0.0}
+        }
+      },
+      "Version": "13"
+    }
+  },
+  "Head": {
+    "RequestArguments": {},
+    "Status": {"Code": 0, "Reason": "", "UserMessage": ""},
+    "Timestamp": "2024-06-11T12:02:20+00:00"
+  }
+}

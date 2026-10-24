@@ -1,0 +1,4 @@
+{
+  "Body": {"Data": {"PAC": {"Unit": "W", "Value": "1200"}}},
+  "Head": {"RequestArguments": {}, "Status": {"Code": 0, "Reason": "", "UserMessage": ""}, "Timestamp": "2021-10-07T10:01:17+02:00"}
+}
