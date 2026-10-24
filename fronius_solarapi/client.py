@@ -72,6 +72,19 @@ V1_ONLY: Final = frozenset({ApiVersion.V1})
 MAX_CONCURRENT_REQUESTS: Final = 2
 DEFAULT_TIMEOUT: Final = 10.0
 
+# Datamanagers reach inverters, meters and storages over Solar Net, whose
+# requests fail now and then and succeed when repeated (about 1 % of inverter
+# requests on Symo devices end in LNRequestTimeout).
+RETRY_STATUS_CODES: Final = frozenset(
+    {
+        StatusCode.LN_REQUEST_ERROR,
+        StatusCode.LN_REQUEST_TIMEOUT,
+        StatusCode.LN_PARSE_ERROR,
+    }
+)
+DEFAULT_STATUS_RETRIES: Final = 2
+DEFAULT_RETRY_DELAY: Final = 0.5
+
 _DEVICE_ID_PARAM: Final = {ApiVersion.V0: "DeviceIndex", ApiVersion.V1: "DeviceId"}
 _V0_ACTIVE_DEVICE_CLASSES: Final = (
     (DeviceClass.INVERTER, "inverters"),
@@ -97,6 +110,8 @@ class FroniusSolarApi:
         *,
         api_version: ApiVersion | None = None,
         timeout: float | aiohttp.ClientTimeout = DEFAULT_TIMEOUT,
+        status_retries: int = DEFAULT_STATUS_RETRIES,
+        retry_delay: float = DEFAULT_RETRY_DELAY,
     ) -> None:
         """Initialize the client.
 
@@ -104,7 +119,16 @@ class FroniusSolarApi:
         plain HTTP is used, which is all most devices support. Without
         `api_version` the highest version the device supports is used; it is
         queried once on the first request.
+
+        A request answered with a transient Solar Net status code (see
+        `RETRY_STATUS_CODES`) is repeated up to `status_retries` times, after
+        waiting `retry_delay` seconds. Connection errors and timeouts are not
+        retried.
         """
+        if status_retries < 0:
+            raise ValueError("status_retries must not be negative")
+        if retry_delay < 0:
+            raise ValueError("retry_delay must not be negative")
         self._session = session
         url = host.rstrip("/")
         if "://" not in url:
@@ -117,6 +141,8 @@ class FroniusSolarApi:
             else aiohttp.ClientTimeout(total=timeout)
         )
         self._semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+        self._status_retries = status_retries
+        self._retry_delay = retry_delay
 
     @property
     def url(self) -> str:
@@ -201,8 +227,23 @@ class FroniusSolarApi:
             query[_DEVICE_ID_PARAM[api_version]] = str(device_id)
             if "DataCollection" in query:
                 query["DataCollection"] = query.pop("DataCollection")
-        raw = await self._get_json(f"{API_BASE_PATHS[api_version]}{endpoint}", query)
-        head = parse_head(raw)
+        path = f"{API_BASE_PATHS[api_version]}{endpoint}"
+        for retry in range(self._status_retries + 1):
+            if retry:
+                # the delay is spent outside the concurrency limit
+                await asyncio.sleep(self._retry_delay)
+            raw = await self._get_json(path, query)
+            head = parse_head(raw)
+            if head.status.code not in RETRY_STATUS_CODES:
+                break
+            _LOGGER.debug(
+                "%s answered status %s (%s), attempt %s of %s",
+                endpoint,
+                head.status.code,
+                head.status.reason,
+                retry + 1,
+                self._status_retries + 1,
+            )
         if head.status.code != StatusCode.OKAY:
             if head.status.code == StatusCode.NOT_SUPPORTED or (
                 head.status.code == StatusCode.UNKNOWN_ERROR

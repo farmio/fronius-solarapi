@@ -77,6 +77,14 @@ All errors derive from `FroniusError`:
     code 255 with a "not supported" reason, as older firmware does for e.g.
     storages on devices without one; also a `NotSupportedError`
 
+Datamanagers reach inverters, meters and storages over Solar Net, whose
+requests fail now and then (about 1 % of inverter requests on Symo devices end
+in `LNRequestTimeout`). Answers with the status codes 7, 8 and 9 (Solar Net
+request error, timeout and parse error) are therefore repeated up to
+`status_retries` times (default 2) after `retry_delay` seconds (default 0.5).
+Every other status code, connection errors and timeouts are raised right away;
+backing off from an unreachable device is left to the caller.
+
 ## Usage
 
 ```python

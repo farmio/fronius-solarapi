@@ -189,5 +189,5 @@ async def session() -> AsyncIterator[aiohttp.ClientSession]:
 
 @pytest.fixture
 def api(mock_fronius: MockFronius, session: aiohttp.ClientSession) -> FroniusSolarApi:
-    """Return a client for the mock device."""
-    return FroniusSolarApi(session, mock_fronius.url)
+    """Return a client for the mock device, retrying without delay."""
+    return FroniusSolarApi(session, mock_fronius.url, retry_delay=0)
