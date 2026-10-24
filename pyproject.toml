@@ -7,7 +7,7 @@ name = "fronius-solarapi"
 dynamic = ["version"]
 description = "Async Python library for the Fronius Solar API (v0 and v1), built on aiohttp"
 readme = "README.md"
-license = "MIT"
+license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
 authors = [{ name = "Matthias Alphart", email = "farmio@alphart.net" }]
 requires-python = ">=3.12"
