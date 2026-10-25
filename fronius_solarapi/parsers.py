@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from datetime import UTC, datetime
 from html import unescape
-from typing import Any
+from typing import Any, Final
 
 from .const import ApiVersion
 from .exceptions import InvalidResponseError
@@ -105,12 +105,54 @@ def _epoch(data: JsonObject, key: str) -> datetime | None:
     return datetime.fromtimestamp(value, tz=UTC)
 
 
+# The unit of each inverter channel the models document. The spec says units
+# never carry a prefix, so anything else would silently scale the value.
+# Channels the spec gives no unit for (ambient temperature, fan speeds) are
+# not checked, and neither are `null` values - nothing is scaled then, and
+# GEN24 devices always report some channels as `null`.
+_CHANNEL_UNITS: Final[dict[str, str]] = {
+    "PAC": "W",
+    "SAC": "VA",
+    "IAC": "A",
+    "UAC": "V",
+    "FAC": "Hz",
+    "IDC": "A",
+    "IDC_2": "A",
+    "IDC_3": "A",
+    "IDC_4": "A",
+    "UDC": "V",
+    "UDC_2": "V",
+    "UDC_3": "V",
+    "UDC_4": "V",
+    "DAY_ENERGY": "Wh",
+    "YEAR_ENERGY": "Wh",
+    "TOTAL_ENERGY": "Wh",
+    "IAC_L1": "A",
+    "IAC_L2": "A",
+    "IAC_L3": "A",
+    "UAC_L1": "V",
+    "UAC_L2": "V",
+    "UAC_L3": "V",
+}
+
+
+def _check_unit(key: str, pair: JsonObject) -> None:
+    """Raise if a channel is reported in another unit than documented."""
+    if (expected := _CHANNEL_UNITS.get(key)) is None:
+        return
+    if (unit := pair.get("Unit")) is not None and unit != expected:
+        raise _invalid(f"{key} is reported in {unit!r} instead of {expected!r}")
+
+
 def _value_of(data: JsonObject, key: str) -> float | None:
     """Return the `Value` of a value-unit pair."""
     pair = data.get(key)
     if pair is None:
         return None
-    return _number(_object(pair, key), "Value")
+    pair = _object(pair, key)
+    if (value := _number(pair, "Value")) is not None:
+        _check_unit(key, pair)
+    return value
 
 
 def _integer_value_of(data: JsonObject, key: str) -> int | None:
@@ -327,7 +369,8 @@ def parse_system_inverter_data(data: JsonObject) -> dict[str, CumulationInverter
     channels: dict[str, dict[str, float | None]] = {}
     device_ids: dict[str, None] = {}
     for channel, content in data.items():
-        values = _first(_object(content, channel), "Values", "Value")
+        content = _object(content, channel)
+        values = _first(content, "Values", "Value")
         if values is None:
             channels[channel] = {}
             continue
@@ -335,6 +378,8 @@ def parse_system_inverter_data(data: JsonObject) -> dict[str, CumulationInverter
             device_id: _number(_object(values, channel), device_id)
             for device_id in _object(values, channel)
         }
+        if any(value is not None for value in channels[channel].values()):
+            _check_unit(channel, content)
         device_ids.update(dict.fromkeys(channels[channel]))
     return {
         device_id: CumulationInverterData(
