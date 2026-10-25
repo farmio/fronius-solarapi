@@ -49,7 +49,8 @@ device reports (the Solar Net address, `"1"` on GEN24).
 All models are frozen dataclasses. Measurements are `float | None` in the base
 unit of the API (W, VA, VAr, Wh, VArh, V, A, Hz, °C, percent), kept as `int`
 where the device reports a number without fraction. Inverter values come with
-their unit, which is checked against the documented one rather than passed on;
+their unit, which is checked against the documented one rather than passed on
+(`null` values are not checked);
 codes are
 `int | None`; flags are `bool | None`. `None` means the device did not report
 the value. Lookups for the codes are included: `InverterInfo.model` and

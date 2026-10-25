@@ -108,7 +108,8 @@ def _epoch(data: JsonObject, key: str) -> datetime | None:
 # The unit of each inverter channel the models document. The spec says units
 # never carry a prefix, so anything else would silently scale the value.
 # Channels the spec gives no unit for (ambient temperature, fan speeds) are
-# not checked.
+# not checked, and neither are `null` values - nothing is scaled then, and
+# GEN24 devices always report some channels as `null`.
 _CHANNEL_UNITS: Final[dict[str, str]] = {
     "PAC": "W",
     "SAC": "VA",
@@ -149,8 +150,9 @@ def _value_of(data: JsonObject, key: str) -> float | None:
     if pair is None:
         return None
     pair = _object(pair, key)
-    _check_unit(key, pair)
-    return _number(pair, "Value")
+    if (value := _number(pair, "Value")) is not None:
+        _check_unit(key, pair)
+    return value
 
 
 def _integer_value_of(data: JsonObject, key: str) -> int | None:
@@ -368,7 +370,6 @@ def parse_system_inverter_data(data: JsonObject) -> dict[str, CumulationInverter
     device_ids: dict[str, None] = {}
     for channel, content in data.items():
         content = _object(content, channel)
-        _check_unit(channel, content)
         values = _first(content, "Values", "Value")
         if values is None:
             channels[channel] = {}
@@ -377,6 +378,8 @@ def parse_system_inverter_data(data: JsonObject) -> dict[str, CumulationInverter
             device_id: _number(_object(values, channel), device_id)
             for device_id in _object(values, channel)
         }
+        if any(value is not None for value in channels[channel].values()):
+            _check_unit(channel, content)
         device_ids.update(dict.fromkeys(channels[channel]))
     return {
         device_id: CumulationInverterData(

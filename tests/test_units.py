@@ -31,7 +31,7 @@ def _common_data() -> dict[str, Any]:
         pytest.param("TOTAL_ENERGY", "kWh", id="energy_with_prefix"),
         pytest.param("IDC_2", "mA", id="current_with_prefix"),
         pytest.param("UAC", "A", id="wrong_quantity"),
-        pytest.param("DAY_ENERGY", "wh", id="case_differs"),
+        pytest.param("TOTAL_ENERGY", "wh", id="case_differs"),
     ],
 )
 def test_common_data_unexpected_unit(key: str, unit: str) -> None:
@@ -41,13 +41,12 @@ def test_common_data_unexpected_unit(key: str, unit: str) -> None:
         parse_common_inverter_data(data)
 
 
-def test_unit_checked_for_null_value() -> None:
-    """GEN24 devices report `null` day energy, still with a unit."""
+def test_unit_not_checked_for_null_value() -> None:
+    """A `null` value can't be scaled wrongly - GEN24 always reports some."""
     data = _common_data()
     data["DAY_ENERGY"]["Unit"] = "kWh"
     assert data["DAY_ENERGY"]["Value"] is None
-    with pytest.raises(InvalidResponseError, match="DAY_ENERGY"):
-        parse_common_inverter_data(data)
+    assert parse_common_inverter_data(data).energy_day is None
 
 
 def test_missing_unit_accepted() -> None:
@@ -84,6 +83,22 @@ def test_system_unexpected_unit() -> None:
     data: dict[str, Any] = raw["Body"]["Data"]
     data["YEAR_ENERGY"]["Unit"] = "MWh"
     with pytest.raises(InvalidResponseError, match="YEAR_ENERGY is reported in 'MWh'"):
+        parse_system_inverter_data(data)
+
+
+def test_system_unit_not_checked_for_null_values() -> None:
+    data = {
+        "PAC": {"Unit": "W", "Values": {"1": 100}},
+        "DAY_ENERGY": {"Unit": "kWh", "Values": {"1": None}},
+    }
+    parsed = parse_system_inverter_data(data)["1"]
+    assert parsed.power_ac == 100
+    assert parsed.energy_day is None
+
+
+def test_system_unit_checked_when_any_value_reported() -> None:
+    data = {"DAY_ENERGY": {"Unit": "kWh", "Values": {"1": None, "2": 1.5}}}
+    with pytest.raises(InvalidResponseError, match="DAY_ENERGY is reported"):
         parse_system_inverter_data(data)
 
 
