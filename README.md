@@ -152,6 +152,7 @@ time out after 10 seconds by default (`timeout=`).
 ```sh
 uv sync
 uv run pytest
+uv run coverage run -m pytest && uv run coverage combine && uv run coverage report
 uv run ruff check . && uv run ruff format --check . && uv run mypy fronius_solarapi tests scripts
 ```
 
