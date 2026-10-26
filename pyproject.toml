@@ -30,6 +30,7 @@ Changelog = "https://github.com/farmio/fronius-solarapi/releases"
 
 [dependency-groups]
 dev = [
+  "coverage[toml]>=7.6",
   "mypy>=1.14",
   "pytest>=8",
   "pytest-asyncio>=0.25",
@@ -73,3 +74,23 @@ strict = true
 testpaths = ["tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["fronius_solarapi", "tests"]
+
+[tool.coverage.paths]
+source = ["fronius_solarapi", "*/site-packages/fronius_solarapi"]
+
+[tool.coverage.report]
+# measured over the whole matrix; raise it when the uncovered lines get tests
+fail_under = 98
+show_missing = true
+skip_covered = true
+skip_empty = true
+exclude_also = [
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+  "^\\s*\\.\\.\\.$",
+]
